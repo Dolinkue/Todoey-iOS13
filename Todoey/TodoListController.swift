@@ -10,7 +10,7 @@ import UIKit
 
 class TodoListViewController: UITableViewController {
     
-    let itemArray = ["find mik","buy eggs", "destory"]
+    var itemArray = ["find mik","buy eggs", "destory"]
 
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -29,10 +29,25 @@ class TodoListViewController: UITableViewController {
         cell.textLabel?.text = itemArray[indexPath.row]
         
         return cell
+    }
     
-    
-
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        // Unselect the row, and instead, show the state with a checkmark.
+        tableView.deselectRow(at: indexPath, animated: true)
+        
+        //tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+        
+        if tableView.cellForRow(at: indexPath)?.accessoryType == .checkmark {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .none
+        } else {
+            tableView.cellForRow(at: indexPath)?.accessoryType = .checkmark
+            
+        }
+        
+        print(itemArray[indexPath.row])
+       
+    }
 
 }
-}
+
 
