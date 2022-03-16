@@ -12,15 +12,15 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
-    // para poder guardar la info en el cel y no se pierda cuando se cierra la aplicacion
-    let defaults = UserDefaults.standard
+    var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        
+        
         let newItem = Item()
         newItem.title = "Find mike"
-        newItem.done = true
         itemArray.append(newItem)
         
         let newItem2 = Item()
@@ -31,12 +31,8 @@ class TodoListViewController: UITableViewController {
         newItem3.title = "mike"
         itemArray.append(newItem3)
         
-        // con esta linea se inicia con el array actualizado
-        //if let items = defaults.array(forKey: "TodoListArray") as? [String] {
-          //  itemArray = items
-        //}
-        
-    }
+       
+        }
     
     // MARK - Tableview DataSource Methods
     
@@ -53,23 +49,26 @@ class TodoListViewController: UITableViewController {
         
         cell.textLabel?.text = item.title
         
-        if item.done == true {
-            cell.accessoryType = .checkmark
-        } else {
-            cell.accessoryType = .none
-        }
+        // ternary reemplazando el if
+        cell.accessoryType = item.done == true ? .checkmark : .none
         
         
         return cell
     }
     
+    
+    // MARK - TableView Delegate Methos
+    
+    
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
         // Unselect the row, and instead, show the state with a checkmark.
         tableView.deselectRow(at: indexPath, animated: true)
         
-        //ternaria para reemplazar if, el !adelante significa o opuesto
+        //el !adelante significa o opuesto
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
+        
+        saveItems()
         
 
         
@@ -95,7 +94,8 @@ class TodoListViewController: UITableViewController {
             
             self.itemArray.append(newItem)
             
-            self.defaults.set(self.itemArray, forKey: "TodoListArray")
+           
+            self.saveItems()
             
             
             // para que se cargue en la lista le debo avisar a la app
@@ -119,8 +119,22 @@ class TodoListViewController: UITableViewController {
         
         }
         
+    // MARK - Model Manupulation Methods
     
-    
+    func saveItems() {
+        let encoder = PropertyListEncoder()
+        
+        // aca para guarda los datos en NS encoder, se trata dentro de Do y Catch porque se esta dentro del un closure y puede dar error
+        
+        do {
+            let data = try encoder.encode(itemArray)
+            //aca dice donde se guarda la info, en el dataFilePath esta la dire en el disco local donde se guarda
+            try data.write(to: dataFilePath!)
+        }catch{
+            print("error encoding item")
+            
+        }
+    }
     
 }
 
