@@ -19,18 +19,7 @@ class TodoListViewController: UITableViewController {
         
         
         
-        let newItem = Item()
-        newItem.title = "Find mike"
-        itemArray.append(newItem)
-        
-        let newItem2 = Item()
-        newItem2.title = "Find"
-        itemArray.append(newItem2)
-        
-        let newItem3 = Item()
-        newItem3.title = "mike"
-        itemArray.append(newItem3)
-        
+        loadItems()
        
         }
     
@@ -136,6 +125,17 @@ class TodoListViewController: UITableViewController {
         }
     }
     
+    func loadItems(){
+        // esto es para abrir el archivo donde guardamos la info y que no se sobre escriba, se usa el try porque puede dar error y se hace optional
+        if  let data = try? Data(contentsOf: dataFilePath!) {
+            let decoder = PropertyListDecoder()
+            do{
+            itemArray = try decoder.decode([Item].self, from: data)
+            } catch {
+                print("\(error)")
+            }
+    }
+    }
 }
 
 
