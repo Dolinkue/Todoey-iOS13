@@ -7,19 +7,23 @@
 //
 
 import UIKit
+import CoreData
 
 class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
     var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
+    
+    // esto se hace para poder acceder a la clase AppDelegate 
+    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         
         
-        loadItems()
+        //loadItems()
        
         }
     
@@ -78,9 +82,12 @@ class TodoListViewController: UITableViewController {
         let action = UIAlertAction(title: "Add item", style: .default) { (action) in
             // lo que pasa cuando el user da click para agregar, agrego al array
             
-            let newItem = Item()
-            newItem.title = textField.text!
             
+            
+            
+            let newItem = Item(context: self.context)
+            newItem.title = textField.text!
+            newItem.done = false
             self.itemArray.append(newItem)
             
            
@@ -111,22 +118,24 @@ class TodoListViewController: UITableViewController {
     // MARK - Model Manupulation Methods
     
     func saveItems() {
-        let encoder = PropertyListEncoder()
         
-        // aca para guarda los datos en NS encoder, se trata dentro de Do y Catch porque se esta dentro del un closure y puede dar error
+        
+        // se codifica la info para poder escribirla y guardala en el archivo que le indique, se hace con do pq puede dar error y se transforma en optional
         
         do {
-            let data = try encoder.encode(itemArray)
+            
+            
+            try context.save()
             //aca dice donde se guarda la info, en el dataFilePath esta la dire en el disco local donde se guarda
-            try data.write(to: dataFilePath!)
+           
         }catch{
-            print("error encoding item")
+            print("error saving context\(error)")
             
         }
     }
     
-    func loadItems(){
-        // esto es para abrir el archivo donde guardamos la info y que no se sobre escriba, se usa el try porque puede dar error y se hace optional
+    /*func loadItems(){
+        // se decodifica el archivo que guardamos arriba en un [] para que pueda ser leido por la app
         if  let data = try? Data(contentsOf: dataFilePath!) {
             let decoder = PropertyListDecoder()
             do{
@@ -135,7 +144,7 @@ class TodoListViewController: UITableViewController {
                 print("\(error)")
             }
     }
-    }
+    }*/
 }
 
 
