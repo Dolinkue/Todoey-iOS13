@@ -21,6 +21,7 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+      
         
         // carga los datos que ya tenemos en la base de datos
         loadItems()
@@ -57,7 +58,13 @@ class TodoListViewController: UITableViewController {
         // Unselect the row, and instead, show the state with a checkmark.
         tableView.deselectRow(at: indexPath, animated: true)
         
-        //el !adelante significa o opuesto
+        //para delete un item, primero se debe eliminar de la base de datos y luego de la app, como en git siempre se debe comunicar con context.save() porque es el realiza el commit y cambia la base
+        //context.delete(itemArray[indexPath.row])
+        //itemArray.remove(at: indexPath.row)
+        
+        
+        
+        //el !adelante significa o opuesto, esto es para hacer done=true y dar el marckchek
         
         itemArray[indexPath.row].done = !itemArray[indexPath.row].done
         
@@ -134,10 +141,10 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems(){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
         
-        //debemos especificar el data type
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        //debemos especificar el data type, y en la funcion si especificamos el parametro, ponemos el dato como default
+        
         
         do {
         // siempre se debe comunicar con el context que es el intermediario, con fetch, trae el dato y lo manda
@@ -146,7 +153,35 @@ class TodoListViewController: UITableViewController {
             print("error fetching context\(error)")
             
         }
+        
+        tableView.reloadData()
     }
+    
+
+    
 }
 
+// MARK - Search bar methods
+
+extension TodoListViewController: UISearchBarDelegate {
+    
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        //aca hacemos el query, como buscamos la info, los que esta en "" es el query y con %@ remplaza el texto
+        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        
+        
+        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+        
+        
+        
+        loadItems(with: request)
+        
+        
+        
+    }
+    
+    
+}
 
