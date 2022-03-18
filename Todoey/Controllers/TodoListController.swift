@@ -15,15 +15,15 @@ class TodoListViewController: UITableViewController {
     
     var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
     
-    // esto se hace para poder acceder a la clase AppDelegate 
+    // esto se hace para poder acceder a la clase AppDelegate
     let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     override func viewDidLoad() {
         super.viewDidLoad()
         
         
-        
-        //loadItems()
+        // carga los datos que ya tenemos en la base de datos
+        loadItems()
        
         }
     
@@ -134,17 +134,19 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    /*func loadItems(){
-        // se decodifica el archivo que guardamos arriba en un [] para que pueda ser leido por la app
-        if  let data = try? Data(contentsOf: dataFilePath!) {
-            let decoder = PropertyListDecoder()
-            do{
-            itemArray = try decoder.decode([Item].self, from: data)
-            } catch {
-                print("\(error)")
-            }
+    func loadItems(){
+        
+        //debemos especificar el data type
+        let request : NSFetchRequest<Item> = Item.fetchRequest()
+        
+        do {
+        // siempre se debe comunicar con el context que es el intermediario, con fetch, trae el dato y lo manda
+            itemArray = try context.fetch(request)
+        }catch{
+            print("error fetching context\(error)")
+            
+        }
     }
-    }*/
 }
 
 
