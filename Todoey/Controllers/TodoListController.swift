@@ -181,6 +181,20 @@ extension TodoListViewController: UISearchBarDelegate {
         
         
     }
+    //para eliminar la busqueda y que vuelva la lista original, este metodo se dispara cuando la barra se modifica, con cual si vuelve a 0 le decis que cargue la lista original
+    
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+            
+            //con esto terminamos el proceso que ocurre en el background de la app
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+            
+            
+        }
+    }
     
     
 }
