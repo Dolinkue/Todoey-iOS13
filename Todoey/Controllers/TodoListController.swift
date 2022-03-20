@@ -13,6 +13,14 @@ class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
     
+    var selectedCategory : Categories? {
+        didSet {
+            // aca carga los datos una vez que son selecionados de la categoria
+            loadItems()
+        }
+        
+    }
+    
     var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
     
     // esto se hace para poder acceder a la clase AppDelegate
@@ -21,14 +29,11 @@ class TodoListViewController: UITableViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-      
-        
-        // carga los datos que ya tenemos en la base de datos
-        loadItems()
+
        
         }
     
-    // MARK - Tableview DataSource Methods
+    // MARK: - Tableview DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         return itemArray.count
@@ -51,7 +56,7 @@ class TodoListViewController: UITableViewController {
     }
     
     
-    // MARK - TableView Delegate Methos
+    // MARK: - TableView Delegate Methos
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
@@ -95,6 +100,7 @@ class TodoListViewController: UITableViewController {
             let newItem = Item(context: self.context)
             newItem.title = textField.text!
             newItem.done = false
+            newItem.parentCategory = self.selectedCategory
             self.itemArray.append(newItem)
             
            
@@ -122,7 +128,7 @@ class TodoListViewController: UITableViewController {
         
         }
         
-    // MARK - Model Manupulation Methods
+    // MARK: - Model Manupulation Methods
     
     func saveItems() {
         
@@ -141,9 +147,18 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest()){
+    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
         
         //debemos especificar el data type, y en la funcion si especificamos el parametro, ponemos el dato como default
+        
+        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+        
+        if let addPredicate = predicate {
+            
+            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addPredicate])
+        } else {
+            request.predicate = categoryPredicate
+        }
         
         
         do {
@@ -161,7 +176,7 @@ class TodoListViewController: UITableViewController {
     
 }
 
-// MARK - Search bar methods
+// MARK: - Search bar methods
 
 extension TodoListViewController: UISearchBarDelegate {
     
@@ -169,14 +184,14 @@ extension TodoListViewController: UISearchBarDelegate {
         let request : NSFetchRequest<Item> = Item.fetchRequest()
         
         //aca hacemos el query, como buscamos la info, los que esta en "" es el query y con %@ remplaza el texto
-        request.predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
         
         
         request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
         
         
         
-        loadItems(with: request)
+        loadItems(with: request, predicate: predicate)
         
         
         

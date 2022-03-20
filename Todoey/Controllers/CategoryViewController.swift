@@ -34,7 +34,7 @@ class CategoryViewController: UITableViewController {
     // MARK: - Table view data source
 
     override func numberOfSections(in tableView: UITableView) -> Int {
-        // #warning Incomplete implementation, return the number of sections
+        
         return 1
     }
 
@@ -69,7 +69,7 @@ class CategoryViewController: UITableViewController {
         
         let alert = UIAlertController(title: "add new Todoey list", message: "", preferredStyle: .alert)
         
-        let action = UIAlertAction(title: "Add item", style: .default) { (action) in
+        let action = UIAlertAction(title: "Add category", style: .default) { (action) in
             
             
             
@@ -81,7 +81,7 @@ class CategoryViewController: UITableViewController {
             self.cateArray.append(newItem)
             
            
-            self.saveItems()
+            self.saveCategory()
             
             
             
@@ -92,7 +92,7 @@ class CategoryViewController: UITableViewController {
         }
         //el espacio para cargar el texto del nuevo item
         alert.addTextField { (alertTextfield) in
-            alertTextfield.placeholder = "create new item"
+            alertTextfield.placeholder = "create new category"
             textField = alertTextfield
             
         }
@@ -104,10 +104,32 @@ class CategoryViewController: UITableViewController {
         
         
         }
-        
-    // MARK - Model Manupulation Methods
     
-    func saveItems() {
+    //MARK: - TableView delegate Methods
+    
+    // esta funcion para cuando se elegi una celda
+    override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
+        
+        
+        performSegue(withIdentifier: "goToItems", sender: self)
+    }
+    
+    override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
+        
+        let destinationVC = segue.destination as! TodoListViewController
+        
+        if let indexPach = tableView.indexPathForSelectedRow {
+            destinationVC.selectedCategory = cateArray[indexPach.row]
+        }
+    }
+    
+    
+    
+    
+        
+    // MARK: - Model Manupulation Methods
+    
+    func saveCategory() {
         
 
         
@@ -144,7 +166,7 @@ class CategoryViewController: UITableViewController {
     
     
     
-    //MARK - TableView delegate Methods
+    
     
     
     
