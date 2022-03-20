@@ -4,20 +4,25 @@
 //
 //  Created by Philipp Muellauer on 02/12/2019.
 //  Copyright © 2019 App Brewery. All rights reserved.
-//
+// change to realm
 
 import UIKit
 import CoreData
 
+
+
 class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
+    let nico = ""
     
     var selectedCategory : Categories? {
         didSet {
             // aca carga los datos una vez que son selecionados de la categoria
             loadItems()
         }
+        
+       
         
     }
     
