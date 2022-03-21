@@ -15,14 +15,10 @@ class CategoryViewController: UITableViewController {
     let realm = try! Realm()
     
     
-    var cateArray = [Category]()
+    // como dataType results los datos se actualizan automaticamente y no debemos agregarlos
+    var cateArray: Results<Category>?
     
     
-    
-    var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask)
-    
-    
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 
     
     
@@ -30,7 +26,7 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
 
         
-        //loadCategory()
+        loadCategory()
         
     }
 
@@ -43,7 +39,7 @@ class CategoryViewController: UITableViewController {
 
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
         
-        return cateArray.count
+        return cateArray?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -51,9 +47,9 @@ class CategoryViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath)
         
-        let item = cateArray[indexPath.row]
+        cell.textLabel?.text = cateArray?[indexPath.row].name ?? "no category"
         
-        cell.textLabel?.text = item.name
+         
         
         
         
@@ -78,7 +74,6 @@ class CategoryViewController: UITableViewController {
             let newCategory = Category()
             newCategory.name = textField.text!
             
-            self.cateArray.append(newCategory)
             
            
             self.save(category: newCategory)
@@ -119,7 +114,7 @@ class CategoryViewController: UITableViewController {
         let destinationVC = segue.destination as! TodoListViewController
         
         if let indexPach = tableView.indexPathForSelectedRow {
-            destinationVC.selectedCategory = cateArray[indexPach.row]
+            destinationVC.selectedCategory = cateArray?[indexPach.row]
         }
     }
     
@@ -146,20 +141,16 @@ class CategoryViewController: UITableViewController {
         }
     }
     
-    //func loadCategory(with request: NSFetchRequest<Categories> = Categories.fetchRequest()){
+    func loadCategory(){
+        
+        
+        //para cargar la info
+        cateArray = realm.objects(Category.self)
         
         
         
-      //  do {
-        
-        //    cateArray = try context.fetch(request)
-        //}catch{
-          //  print("error fetching context\(error)")
-            
-       // }
-        
-        //tableView.reloadData()
-    //}
+        tableView.reloadData()
+    }
     
     
         

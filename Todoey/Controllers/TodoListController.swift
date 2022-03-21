@@ -7,30 +7,27 @@
 // change to realm
 
 import UIKit
-import CoreData
+import RealmSwift
 
 
 
 class TodoListViewController: UITableViewController {
     
-    var itemArray = [Item]()
-    
+    var todoItems: Results<Item>?
+    let realm = try! Realm()
     
     var selectedCategory : Category? {
         didSet {
             // aca carga los datos una vez que son selecionados de la categoria
-            //loadItems()
+            loadItems()
         }
         
        
         
     }
     
-    var dataFilePath = FileManager.default.urls(for: .documentDirectory, in: .userDomainMask).first?.appendingPathComponent("items.plist")
     
-    // esto se hace para poder acceder a la clase AppDelegate
-    let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
@@ -41,7 +38,7 @@ class TodoListViewController: UITableViewController {
     // MARK: - Tableview DataSource Methods
     
     override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        return itemArray.count
+        return todoItems?.count ?? 1
     }
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
@@ -49,12 +46,17 @@ class TodoListViewController: UITableViewController {
         
         let cell = tableView.dequeueReusableCell(withIdentifier: "todoItemCell", for: indexPath)
         
-        let item = itemArray[indexPath.row]
+        if let item = todoItems?[indexPath.row] {
+            cell.textLabel?.text = item.title
+            
+            // ternary reemplazando el if
+            cell.accessoryType = item.done == true ? .checkmark : .none
+            
+        } else {
+            cell.textLabel?.text = "No Items added"
+        }
         
-        cell.textLabel?.text = item.title
         
-        // ternary reemplazando el if
-        cell.accessoryType = item.done == true ? .checkmark : .none
         
         
         return cell
@@ -65,24 +67,24 @@ class TodoListViewController: UITableViewController {
     
     
     override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
-        // Unselect the row, and instead, show the state with a checkmark.
+        
+        
+        if let item = todoItems?[indexPath.row] {
+            do {
+            try realm.write {
+                item.done = !item.done
+            }
+            }catch {
+                print("el \(error)")
+            }
+        }
+        
         tableView.deselectRow(at: indexPath, animated: true)
         
-        //para delete un item, primero se debe eliminar de la base de datos y luego de la app, como en git siempre se debe comunicar con context.save() porque es el realiza el commit y cambia la base
-        //context.delete(itemArray[indexPath.row])
-        //itemArray.remove(at: indexPath.row)
-        
-        
-        
-        //el !adelante significa o opuesto, esto es para hacer done=true y dar el marckchek
-        
-        itemArray[indexPath.row].done = !itemArray[indexPath.row].done
-        
-        saveItems()
-        
+ 
 
         
-        // hacemos que se vuelva a cargar la tabla
+        // hacemos que se vuelva a cargar la tabla, y enviamos la info a para poner la marca o no arriba de esta funcion
         tableView.reloadData()
         
    
@@ -100,16 +102,22 @@ class TodoListViewController: UITableViewController {
             // lo que pasa cuando el user da click para agregar, agrego al array
             
             
+            if let currentCategory = self.selectedCategory {
+                do {
+                    try self.realm.write {
+                    let newItem = Item()
+                    newItem.title = textField.text!
+                    currentCategory.items.append(newItem)
+                    
+                }
+                } catch {
+                    print("error \(error)")
+                }
+            }
             
-            
-  //          let newItem = Item(context: self.context)
-    //        newItem.title = textField.text!
-      //      newItem.done = false
-        //    newItem.parentCategory = self.selectedCategory
-          //  self.itemArray.append(newItem)
-            
+            self.tableView.reloadData()
            
-            self.saveItems()
+            
             
             
             // para que se cargue en la lista le debo avisar a la app
@@ -135,7 +143,7 @@ class TodoListViewController: UITableViewController {
         
     // MARK: - Model Manupulation Methods
     
-    func saveItems() {
+    func save(item: Item) {
         
         
         // se codifica la info para poder escribirla y guardala en el archivo que le indique, se hace con do pq puede dar error y se transforma en optional
@@ -143,39 +151,21 @@ class TodoListViewController: UITableViewController {
         do {
             
             
-            try context.save()
-            //aca dice donde se guarda la info, en el dataFilePath esta la dire en el disco local donde se guarda
-           
+            try realm.write {
+                realm.add(item)
+            }
         }catch{
             print("error saving context\(error)")
             
         }
     }
     
-   // func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
+    func loadItems(){
         
-        //debemos especificar el data type, y en la funcion si especificamos el parametro, ponemos el dato como default
+        todoItems = selectedCategory?.items.sorted(byKeyPath: "title", ascending: true)
         
-     //   let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
-        
-       // if let addPredicate = predicate {
-            
-         //   request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: //[categoryPredicate, addPredicate])
-       // } else {
-         //   request.predicate = categoryPredicate
-        //}
-        
-        
-       // do {
-        // siempre se debe comunicar con el context que es el intermediario, con fetch, trae el dato y lo manda
-         //   itemArray = try context.fetch(request)
-       // }catch{
-         //   print("error fetching context\(error)")
-            
-        //}
-        
-        //tableView.reloadData()
-   // }
+        tableView.reloadData()
+    }
     
 
     
