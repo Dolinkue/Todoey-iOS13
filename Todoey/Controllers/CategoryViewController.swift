@@ -7,12 +7,15 @@
 //
 
 import UIKit
-import CoreData
+import RealmSwift
 
 class CategoryViewController: UITableViewController {
+     
+    
+    let realm = try! Realm()
     
     
-    var cateArray = [Categories]()
+    var cateArray = [Category]()
     
     
     
@@ -27,7 +30,7 @@ class CategoryViewController: UITableViewController {
         super.viewDidLoad()
 
         
-        loadItems()
+        //loadCategory()
         
     }
 
@@ -72,16 +75,13 @@ class CategoryViewController: UITableViewController {
         let action = UIAlertAction(title: "Add category", style: .default) { (action) in
             
             
+            let newCategory = Category()
+            newCategory.name = textField.text!
             
-            
-            
-            let newItem = Categories(context: self.context)
-            newItem.name = textField.text!
-            
-            self.cateArray.append(newItem)
+            self.cateArray.append(newCategory)
             
            
-            self.saveCategory()
+            self.save(category: newCategory)
             
             
             
@@ -129,14 +129,16 @@ class CategoryViewController: UITableViewController {
         
     // MARK: - Model Manupulation Methods
     
-    func saveCategory() {
+    func save(category: Category) {
         
 
         
         do {
             
             
-            try context.save()
+            try realm.write {
+                realm.add(category)
+            }
             
         }catch{
             print("error saving context\(error)")
@@ -144,20 +146,20 @@ class CategoryViewController: UITableViewController {
         }
     }
     
-    func loadItems(with request: NSFetchRequest<Categories> = Categories.fetchRequest()){
+    //func loadCategory(with request: NSFetchRequest<Categories> = Categories.fetchRequest()){
         
         
         
-        do {
+      //  do {
         
-            cateArray = try context.fetch(request)
-        }catch{
-            print("error fetching context\(error)")
+        //    cateArray = try context.fetch(request)
+        //}catch{
+          //  print("error fetching context\(error)")
             
-        }
+       // }
         
-        tableView.reloadData()
-    }
+        //tableView.reloadData()
+    //}
     
     
         

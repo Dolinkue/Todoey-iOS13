@@ -14,12 +14,12 @@ import CoreData
 class TodoListViewController: UITableViewController {
     
     var itemArray = [Item]()
-    let nico = ""
     
-    var selectedCategory : Categories? {
+    
+    var selectedCategory : Category? {
         didSet {
             // aca carga los datos una vez que son selecionados de la categoria
-            loadItems()
+            //loadItems()
         }
         
        
@@ -102,11 +102,11 @@ class TodoListViewController: UITableViewController {
             
             
             
-            let newItem = Item(context: self.context)
-            newItem.title = textField.text!
-            newItem.done = false
-            newItem.parentCategory = self.selectedCategory
-            self.itemArray.append(newItem)
+  //          let newItem = Item(context: self.context)
+    //        newItem.title = textField.text!
+      //      newItem.done = false
+        //    newItem.parentCategory = self.selectedCategory
+          //  self.itemArray.append(newItem)
             
            
             self.saveItems()
@@ -152,30 +152,30 @@ class TodoListViewController: UITableViewController {
         }
     }
     
-    func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
+   // func loadItems(with request: NSFetchRequest<Item> = Item.fetchRequest(), predicate: NSPredicate? = nil){
         
         //debemos especificar el data type, y en la funcion si especificamos el parametro, ponemos el dato como default
         
-        let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
+     //   let categoryPredicate = NSPredicate(format: "parentCategory.name MATCHES %@", selectedCategory!.name!)
         
-        if let addPredicate = predicate {
+       // if let addPredicate = predicate {
             
-            request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: [categoryPredicate, addPredicate])
-        } else {
-            request.predicate = categoryPredicate
-        }
+         //   request.predicate = NSCompoundPredicate(andPredicateWithSubpredicates: //[categoryPredicate, addPredicate])
+       // } else {
+         //   request.predicate = categoryPredicate
+        //}
         
         
-        do {
+       // do {
         // siempre se debe comunicar con el context que es el intermediario, con fetch, trae el dato y lo manda
-            itemArray = try context.fetch(request)
-        }catch{
-            print("error fetching context\(error)")
+         //   itemArray = try context.fetch(request)
+       // }catch{
+         //   print("error fetching context\(error)")
             
-        }
+        //}
         
-        tableView.reloadData()
-    }
+        //tableView.reloadData()
+   // }
     
 
     
@@ -183,39 +183,39 @@ class TodoListViewController: UITableViewController {
 
 // MARK: - Search bar methods
 
-extension TodoListViewController: UISearchBarDelegate {
-    
-    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-        let request : NSFetchRequest<Item> = Item.fetchRequest()
-        
-        //aca hacemos el query, como buscamos la info, los que esta en "" es el query y con %@ remplaza el texto
-        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-        
-        
-        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-        
-        
-        
-        loadItems(with: request, predicate: predicate)
-        
-        
-        
-    }
-    //para eliminar la busqueda y que vuelva la lista original, este metodo se dispara cuando la barra se modifica, con cual si vuelve a 0 le decis que cargue la lista original
-    
-    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-        if searchBar.text?.count == 0 {
-            loadItems()
-            
-            //con esto terminamos el proceso que ocurre en el background de la app
-            DispatchQueue.main.async {
-                searchBar.resignFirstResponder()
-            }
-            
-            
-        }
-    }
-    
-    
-}
-
+//extension TodoListViewController: UISearchBarDelegate {
+//
+//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+//        let request : NSFetchRequest<Item> = Item.fetchRequest()
+//
+//        //aca hacemos el query, como buscamos la info, los que esta en "" es el query y con %@ remplaza el texto
+//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
+//
+//
+//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
+//
+//
+//
+//        loadItems(with: request, predicate: predicate)
+//
+//
+//
+//    }
+//    //para eliminar la busqueda y que vuelva la lista original, este metodo se dispara cuando la barra se modifica, con cual si vuelve a 0 le decis que cargue la lista original
+//
+//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+//        if searchBar.text?.count == 0 {
+//            loadItems()
+//
+//            //con esto terminamos el proceso que ocurre en el background de la app
+//            DispatchQueue.main.async {
+//                searchBar.resignFirstResponder()
+//            }
+//
+//
+//        }
+//    }
+//
+//
+//}
+//
