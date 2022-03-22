@@ -72,10 +72,12 @@ class TodoListViewController: UITableViewController {
         if let item = todoItems?[indexPath.row] {
             do {
             try realm.write {
+                
+                // realm.delete(item)
                 item.done = !item.done
             }
             }catch {
-                print("el \(error)")
+                print("error saving \(error)")
             }
         }
         
@@ -107,6 +109,7 @@ class TodoListViewController: UITableViewController {
                     try self.realm.write {
                     let newItem = Item()
                     newItem.title = textField.text!
+                    newItem.dateCreated = Date()
                     currentCategory.items.append(newItem)
                     
                 }
@@ -173,39 +176,33 @@ class TodoListViewController: UITableViewController {
 
 // MARK: - Search bar methods
 
-//extension TodoListViewController: UISearchBarDelegate {
-//
-//    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
-//        let request : NSFetchRequest<Item> = Item.fetchRequest()
-//
-//        //aca hacemos el query, como buscamos la info, los que esta en "" es el query y con %@ remplaza el texto
-//        let predicate = NSPredicate(format: "title CONTAINS[cd] %@", searchBar.text!)
-//
-//
-//        request.sortDescriptors = [NSSortDescriptor(key: "title", ascending: true)]
-//
-//
-//
-//        loadItems(with: request, predicate: predicate)
-//
-//
-//
-//    }
-//    //para eliminar la busqueda y que vuelva la lista original, este metodo se dispara cuando la barra se modifica, con cual si vuelve a 0 le decis que cargue la lista original
-//
-//    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
-//        if searchBar.text?.count == 0 {
-//            loadItems()
-//
-//            //con esto terminamos el proceso que ocurre en el background de la app
-//            DispatchQueue.main.async {
-//                searchBar.resignFirstResponder()
-//            }
-//
-//
-//        }
-//    }
-//
-//
-//}
-//
+extension TodoListViewController: UISearchBarDelegate {
+
+    func searchBarSearchButtonClicked(_ searchBar: UISearchBar) {
+        
+        
+        // aca realizamos la busquedas, pasamos el query como queremos buscar y en donde(searchbar)
+        todoItems = todoItems?.filter("title CONTAINS[cd] %@", searchBar.text!).sorted(byKeyPath: "dateCreated", ascending: true)
+        
+        tableView.reloadData()
+
+
+    }
+    //para eliminar la busqueda y que vuelva la lista original, este metodo se dispara cuando la barra se modifica, con cual si vuelve a 0 le decis que cargue la lista original
+
+    func searchBar(_ searchBar: UISearchBar, textDidChange searchText: String) {
+        if searchBar.text?.count == 0 {
+            loadItems()
+
+            //con esto terminamos el proceso que ocurre en el background de la app
+            DispatchQueue.main.async {
+                searchBar.resignFirstResponder()
+            }
+
+
+        }
+    }
+
+
+}
+
