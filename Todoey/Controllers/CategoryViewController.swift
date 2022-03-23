@@ -8,10 +8,9 @@
 
 import UIKit
 import RealmSwift
-import SwipeCellKit
 
-
-class CategoryViewController: UITableViewController {
+// hacemos heredar de swipe porque es la super clase que vamos a crear para incluir el swipe
+class CategoryViewController: SwipeViewController {
      
     
     let realm = try! Realm()
@@ -47,27 +46,20 @@ class CategoryViewController: UITableViewController {
         return cateArray?.count ?? 1
     }
     
-//    override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
-//        let cell = tableView.dequeueReusableCell(withIdentifier: "Cell") as! SwipeTableViewCell
-//        cell.delegate = self
-//        return cell
-//    }
-    
+
     
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
         
+        // con super va a la super class y ejecuta el codigo dentro de cellForRowAt
+        let cell = super.tableView(tableView, cellForRowAt: indexPath)
         
-        let cell = tableView.dequeueReusableCell(withIdentifier: "CategoryCell", for: indexPath) as! SwipeTableViewCell
-        
-        cell.textLabel?.text = cateArray?[indexPath.row].name ?? "no category"
-        cell.delegate = self
-        
+        cell.textLabel?.text = cateArray?[indexPath.row].name ?? "no category added yet"
         
         return cell
-    }
+     
 
-    
+    }
 
     
     @IBAction func addBottonPressed(_ sender: UIBarButtonItem) {
@@ -162,46 +154,28 @@ class CategoryViewController: UITableViewController {
         tableView.reloadData()
     }
     
+    // esta funcion sobre escribe la funcio de super clase updatemodel y pasa los datos que se encuentran aca 
+    override func updateModel(at indexPath: IndexPath) {
+        
+        if let cate = self.cateArray?[indexPath.row] {
+            do {
+                try self.realm.write {
+
+
+                    self.realm.delete(cate)
+                }
+                }catch {
+                    print("error saving \(error)")
+            }
+        }
+    }
+    
     
         
     }
     
 
-//MARK: - Swipe Cell Delegate Methods
 
-
-extension CategoryViewController: SwipeTableViewCellDelegate {
-    
-    func tableView(_ tableView: UITableView, editActionsForRowAt indexPath: IndexPath, for orientation: SwipeActionsOrientation) -> [SwipeAction]? {
-        guard orientation == .right else { return nil }
-
-        let deleteAction = SwipeAction(style: .destructive, title: "Delete") { action, indexPath in
-            // handle action by updating model with deletion, donde pasa la accion
-            
-            if let cate = self.cateArray?[indexPath.row] {
-                do {
-                    try self.realm.write {
-                        
-                      
-                        self.realm.delete(cate)
-                    }
-                    }catch {
-                        print("error saving \(error)")
-                }
-            }
-            tableView.deselectRow(at: indexPath, animated: true)
-            
-            tableView.reloadData()
-            
-        }
-
-        // customize the action appearance
-        deleteAction.image = UIImage(named: "trash-circle")
-
-        return [deleteAction]
-    }
-    
-}
     
     
     
