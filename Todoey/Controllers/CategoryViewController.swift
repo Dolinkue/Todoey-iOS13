@@ -154,7 +154,7 @@ class CategoryViewController: SwipeViewController {
         tableView.reloadData()
     }
     
-    // esta funcion sobre escribe la funcio de super clase updatemodel y pasa los datos que se encuentran aca 
+    
     override func updateModel(at indexPath: IndexPath) {
         
         if let cate = self.cateArray?[indexPath.row] {

@@ -21,6 +21,7 @@ class SwipeViewController: UITableViewController, SwipeTableViewCellDelegate {
     // TableView DataSource Methods
     
     override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+        
         let cell = tableView.dequeueReusableCell(withIdentifier: "Cell", for: indexPath) as! SwipeTableViewCell
           
           
@@ -40,9 +41,6 @@ class SwipeViewController: UITableViewController, SwipeTableViewCellDelegate {
             
             self.updateModel(at: indexPath)
             
-            
-            
-
             
             
         }
