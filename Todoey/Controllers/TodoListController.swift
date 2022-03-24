@@ -8,6 +8,7 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 
 
@@ -50,6 +51,14 @@ class TodoListViewController: SwipeViewController {
         
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
+            
+            // para dar el color a las cell y que se vayan oscureciendo viene de cocopod, con uicolor hex traigo el color de la categoria 
+            if let colour = UIColor(hexString: selectedCategory!.colores!)!.darken(byPercentage: CGFloat(indexPath.row)/CGFloat(todoItems!.count)) {
+                cell.backgroundColor = colour
+                cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
+            }
+            
+            
 
             // ternary reemplazando el if
             cell.accessoryType = item.done == true ? .checkmark : .none
