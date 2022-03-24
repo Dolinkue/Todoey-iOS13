@@ -8,16 +8,17 @@
 
 import UIKit
 import RealmSwift
+import ChameleonFramework
 
 // hacemos heredar de swipe porque es la super clase que vamos a crear para incluir el swipe
 class CategoryViewController: SwipeViewController {
      
-    
+    // como dataType results los datos se actualizan automaticamente y no debemos agregarlos
+    var cateArray: Results<Category>?
     let realm = try! Realm()
     
     
-    // como dataType results los datos se actualizan automaticamente y no debemos agregarlos
-    var cateArray: Results<Category>?
+    
     
     
 
@@ -29,7 +30,7 @@ class CategoryViewController: SwipeViewController {
         
         loadCategory()
         
-        tableView.rowHeight = 80.0
+        
         
         
     }
@@ -56,6 +57,11 @@ class CategoryViewController: SwipeViewController {
         
         cell.textLabel?.text = cateArray?[indexPath.row].name ?? "no category added yet"
         
+        cell.backgroundColor = UIColor(hexString: cateArray?[indexPath.row].colores ?? "1D9BF6" )
+     
+        
+        
+        
         return cell
      
 
@@ -74,6 +80,7 @@ class CategoryViewController: SwipeViewController {
             
             let newCategory = Category()
             newCategory.name = textField.text!
+            newCategory.colores = UIColor.randomFlat().hexValue()
             
             
             

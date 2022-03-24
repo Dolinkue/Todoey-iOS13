@@ -32,8 +32,7 @@ class TodoListViewController: SwipeViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
-
-       
+        
         }
     
     // MARK: - Tableview DataSource Methods
