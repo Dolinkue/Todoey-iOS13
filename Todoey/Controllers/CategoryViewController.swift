@@ -31,8 +31,10 @@ class CategoryViewController: SwipeViewController {
         loadCategory()
         
         
-        
-        
+    }
+    
+    override func viewWillAppear(_ animated: Bool) {
+        navigationController?.navigationBar.backgroundColor = UIColor(hexString: "1D9BF6")
     }
 
     // MARK: - Table view data source

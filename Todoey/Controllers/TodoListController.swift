@@ -15,6 +15,9 @@ import ChameleonFramework
 
 class TodoListViewController: SwipeViewController {
     
+    @IBOutlet weak var searchBar: UISearchBar!
+    
+    
     var todoItems: Results<Item>?
     let realm = try! Realm()
     
@@ -33,8 +36,33 @@ class TodoListViewController: SwipeViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         
+        tableView.separatorStyle = .none
+        
+
         
         }
+    
+    
+    
+    // esta funcion se ejecuta justo antes de que el usuario vea nada y este todo cargado
+    override func viewWillAppear(_ animated: Bool) {
+        
+        if let colourHex = selectedCategory?.colores {
+           
+            title = selectedCategory!.name
+            
+            searchBar.barTintColor = UIColor(hexString: colourHex)
+            searchBar.searchTextField.backgroundColor = FlatWhite()
+            
+            navigationController?.navigationBar.backgroundColor = UIColor(hexString: colourHex)
+            
+            navigationController?.navigationBar.tintColor = ContrastColorOf(UIColor(hexString: colourHex)!, returnFlat: true)
+            
+            navigationController?.navigationBar.largeTitleTextAttributes = [NSAttributedString.Key.foregroundColor:ContrastColorOf(UIColor(hexString: colourHex)!, returnFlat: true)]
+        }
+    }
+    
+    
     
     // MARK: - Tableview DataSource Methods
     
@@ -52,7 +80,7 @@ class TodoListViewController: SwipeViewController {
         if let item = todoItems?[indexPath.row] {
             cell.textLabel?.text = item.title
             
-            // para dar el color a las cell y que se vayan oscureciendo viene de cocopod, con uicolor hex traigo el color de la categoria 
+            // para dar el color a las cell y que se vayan oscureciendo viene de cocopod, con uicolor hex traigo el color de la categoria
             if let colour = UIColor(hexString: selectedCategory!.colores!)!.darken(byPercentage: CGFloat(indexPath.row)/CGFloat(todoItems!.count)) {
                 cell.backgroundColor = colour
                 cell.textLabel?.textColor = ContrastColorOf(colour, returnFlat: true)
